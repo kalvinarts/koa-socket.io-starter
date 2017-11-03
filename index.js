@@ -84,7 +84,7 @@ app.io.use((socket, next) => {
     // Setup session
     const cookies = cookie.parse(socket.handshake.headers.cookie);
     const sid = cookies[`${config.package.name}:sess`];
-    const session = sessionStore.get(sid);
+    const session = await sessionStore.get(sid);
     socket.session = session || {};
     
     // Attach the sessions store (this allows to save sessions)
@@ -99,7 +99,6 @@ app.io.use((socket, next) => {
 
     next();
   })();
-  
 });
 
 // Setup the socket.io api
