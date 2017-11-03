@@ -1,0 +1,27 @@
+{
+  "name": "koa-socket.io-starter",
+  "version": "0.0.1",
+  "description": "Starter project for backend based on koa and socket.io",
+  "main": "index.js",
+  "repository": "https://github.com/kalvinarts/koa-socket.io-starter",
+  "author": "kalvin",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "devel": "nodemon index.js"
+  },
+  "dependencies": {
+    "@koa/cors": "2",
+    "cookie": "^0.3.1",
+    "debug": "^3.1.0",
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-router": "^7.2.1",
+    "koa-session": "^5.5.0",
+    "koa-session-memory": "^1.0.2",
+    "koa-static": "^4.0.1",
+    "nodemon": "^1.12.1",
+    "socket.io": "^2.0.4"
+  }
+}

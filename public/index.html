@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>koa-socket.io-starter</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="content"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Logging helper
+    const logEls = [];
+    const log = (...args) => {
+      const line = document.createElement('pre');
+      logEls.push(line);
+      line.innerText = `${
+        args
+        .map(arg => typeof arg === 'string' ?
+          arg :
+          JSON.stringify(arg, null, 2)
+        )
+        .join(' ')
+      }`;
+      const logEl = document.getElementById('content');
+      logEl.appendChild(line);
+    };
+    
+    // Promisify a callback function
+    const promisify = func => new Promise((f, r) => {
+      try { func(err => err ? r(err) : f()); }
+      catch (err) { r(err) }
+    });
+
+    // Fetch helper
+    const callHTTP = (path, { method = 'GET', body } = {}) => {
+      if (body)
+        return fetch(path, {
+          method,
+          credentials: 'include',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          }
+        })
+        .then(res => res.json()).catch(err => log('error', err));
+      else
+        return fetch(path, { method, credentials: 'include' })
+        .then(res => res.json()).catch(err => log('error', err));
+    }
+    
+    // MAIN
+
+    const socket = io();
+
+    log('front > Testing backend')
+
+    // Login
+    log('http::user::login > ...');
+    callHTTP('/api/user/login', { method: 'POST', body: {
+      user: 'admin',
+      password: '$up3rSecR€t'
+    }})
+    .then(res => log('http::user::login >', res))
+
+    // Get user info
+    .then(res => log('http::user > ...'))
+    .then(() => callHTTP('/api/user'))
+    .then(res => log('http::user >', res))
+
+    // Get user info from socket.io
+    .then(() => promisify(next => {
+      log('socket::user > ...');
+      socket.on('user', msg => {
+        log('ws::user', msg);
+        next();
+      });
+      socket.emit('user');
+    }))
+
+    // Log out
+    .then(() => callHTTP('/api/user/logout', { method: 'POST' }))
+
+    .then(() => log('front > all tests done'));
+
+  </script>
+</body>
+</html>
